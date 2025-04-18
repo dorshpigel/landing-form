@@ -12,11 +12,8 @@ const geistMono = Geist_Mono({
   subsets: ["latin"],
 });
 
-export const metadata: Metadata = {
+const metadata: Metadata = {
   title: "Landing Form",
-  icons: {
-    icon: "/title-icon.png"
-  }
 };
 
 export default function RootLayout({
