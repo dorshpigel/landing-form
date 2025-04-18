@@ -7,7 +7,7 @@ export default function AppLayout({ children }: { children: ReactNode }) {
         <img
           className="max-w-[1.75rem] max-h-[1.75rem]"
           src={
-            "https://d1nhio0ox7pgb.cloudfront.net/_img/i_collection_png/256x256/plain/spy.png"
+            "title-icon.png"
           }
         ></img>
         <div className="w-full mx-auto text-xl font-semibold">

@@ -9,7 +9,7 @@ export default async function handler(
     return res.status(405).json({ error: "Method not allowed" });
   }
 
-  const { name, email, message } = req.body;
+  const { name, email, message,phone } = req.body;
 
   if (!name || !email || !message) {
     return res.status(400).json({ error: "Missing required fields" });
@@ -17,9 +17,10 @@ export default async function handler(
 
   try {
     await submitToAirtable({
-      Name: name,
-      Email: email,
-      Message: message,
+      name: name,
+      email: email,
+      message: message,
+      phone: phone
     });
     return res.status(200).json({ success: true });
   } catch (error) {

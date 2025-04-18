@@ -1,34 +1,53 @@
+"use client";
 import { useState } from "react";
 import LabeledInput from "./LabeledInput";
 import { toast } from "react-toastify";
+import { submitForm } from "@/app/lib/services/api.service";
 
-type ReportFormProps = {
+type FormProps = {
   onSuccess: () => void;
-  prefilledUUID?: string;
 };
-//need to re-do
-export default function ReportForm(props: ReportFormProps) {
-  const { onSuccess,prefilledUUID } = props;
-  //const { submitReport, data, loading, error } = usePostReport();
-  const [uuid, setUuid] = useState(prefilledUUID ?? "");
-  const [hashes, setHashes] = useState("");
-  const [nextCheck, setNextCheck] = useState(() => new Date().toISOString());
+
+export default function Form(props: FormProps) {
+  const { onSuccess } = props;
+  const [name, setName] = useState("");
+  const [email, setEmail] = useState("");
+  const [phone, setPhone] = useState("");
+  const [message, setMessage] = useState("");
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<Error | null>(null);
+  const [data, setData] = useState<any>(null);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-
-    const hashArray = hashes
-      .split(",")
-      .map((h) => h.trim())
-      .filter(Boolean);
-    if (!uuid || hashArray.length === 0) return;
+    setLoading(true);
+    setError(null);
+    setData(null);
 
     try {
+      const res = await submitForm({
+        name,
+        email,
+        phone,
+        message,
+      });
 
-      toast.success("Report submitted successfully!");
-      setTimeout(onSuccess, 3000)
-    } catch (_) {
-      toast.error("Failed to submit report. Please try again.");
+      if (!res.success) {
+        throw new Error(res.error || "Unknown error");
+      }
+
+      setData(res);
+      toast.success("Form submitted successfully!");
+      onSuccess?.();
+      setName("");
+      setEmail("");
+      setPhone("");
+      setMessage("");
+    } catch (err: any) {
+      setError(err);
+      toast.error(err.message || "Failed to submit form. Please try again.");
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -38,38 +57,49 @@ export default function ReportForm(props: ReportFormProps) {
       className="space-y-4 max-w-md mx-auto p-4 border rounded-xl bg-white shadow"
     >
       <LabeledInput
-        label="Endpoint UUID"
-        value={uuid}
-        onChange={(e) => setUuid(e.target.value)}
-        placeholder="e.g., endpoint-123"
+        type="text"
+        label="Name"
+        value={name}
+        onChange={(e) => setName(e.target.value)}
+        placeholder="Name"
       />
       <LabeledInput
-        label="Hashes (comma separated)"
-        value={hashes}
-        onChange={(e) => setHashes(e.target.value)}
-        placeholder="abc123, def456, ..."
+        type="phone"
+        label="Phone"
+        value={phone}
+        onChange={(e) => setPhone(e.target.value)}
+        placeholder="Phone"
       />
       <LabeledInput
-        label="Next Check (ISO format)"
-        value={nextCheck}
-        onChange={(e) => setNextCheck(e.target.value)}
+        type="email"
+        label="Email"
+        value={email}
+        onChange={(e) => setEmail(e.target.value)}
         placeholder="2025-04-15T20:00:00.000Z"
+      />
+
+      <LabeledInput
+        type="text"
+        label="Message"
+        value={message}
+        onChange={(e) => setMessage(e.target.value)}
+        placeholder="Message"
       />
 
       <button
         type="submit"
-        disabled={false} //need to hook to something
+        disabled={loading || !name || !email || !message || !phone}
         className="bg-blue-600 cursor-pointer text-white px-4 py-2 rounded hover:bg-blue-700 disabled:opacity-50"
       >
-        {loading ? "Submitting..." : "Submit Report"}
+        {loading ? "Submitting..." : "Submit Form"}
       </button>
 
       {error && <p className="text-red-600 mt-2">Error: {error.message}</p>}
       {data && (
         <p className="text-green-600 mt-2">
-          {data.malicious.length > 0
-            ? `Detected malicious: ${data.malicious.join(", ")}`
-            : "No malicious files detected"}
+          {data
+            ? `Form submitted successfully!`
+            : "There was an error submitting the form."}
         </p>
       )}
     </form>

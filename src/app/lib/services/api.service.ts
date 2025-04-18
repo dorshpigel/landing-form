@@ -1,10 +1,9 @@
 import axiosInstance from "./http.service";
+import { Message } from "../types/types";
 
-export async function submitForm(data: {
-  name: string;
-  email: string;
-  message: string;
-}): Promise<{ success: boolean; error?: string }> {
+export async function submitForm(
+  data: Message
+): Promise<{ success: boolean; error?: string }> {
   try {
     const res = await axiosInstance.post("/api/submit", data, {
       headers: { "Content-Type": "application/json" },
