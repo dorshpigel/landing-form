@@ -3,6 +3,7 @@ import { useState } from "react";
 import LabeledInput from "./LabeledInput";
 import { toast } from "react-toastify";
 import { submitForm } from "@/app/lib/services/api.service";
+import { validateEmail, validatePhoneNumber } from "@/app/lib/services/common";
 
 type FormProps = {
   onSuccess: () => void;
@@ -20,17 +21,28 @@ export default function Form(props: FormProps) {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+
+    if (!name.trim() || !email.trim() || !message.trim() || !phone.trim()) {
+      toast.error("Please fill in all required fields.");
+      return;
+    }
+
+    if (!validateEmail(email)) {
+      toast.error("Please enter a valid email address.");
+      return;
+    }
+
+    if (!validatePhoneNumber(phone)) {
+      toast.error("Please enter a valid phone number.");
+      return;
+    }
+
     setLoading(true);
     setError(null);
     setData(null);
 
     try {
-      const res = await submitForm({
-        name,
-        email,
-        phone,
-        message,
-      });
+      const res = await submitForm({ name, email, phone, message });
 
       if (!res.success) {
         throw new Error(res.error || "Unknown error");
@@ -39,6 +51,7 @@ export default function Form(props: FormProps) {
       setData(res);
       toast.success("Form submitted successfully!");
       onSuccess?.();
+
       setName("");
       setEmail("");
       setPhone("");
@@ -54,52 +67,54 @@ export default function Form(props: FormProps) {
   return (
     <form
       onSubmit={handleSubmit}
-      className="space-y-4 max-w-md mx-auto p-4 border rounded-xl bg-white shadow"
+      className="space-y-5 max-w-md mx-auto p-6 border border-gray-200 rounded-2xl bg-white/80 backdrop-blur-md shadow-xl"
     >
       <LabeledInput
         type="text"
         label="Name"
         value={name}
         onChange={(e) => setName(e.target.value)}
-        placeholder="Name"
+        placeholder="Jane Doe"
       />
       <LabeledInput
-        type="phone"
+        type="tel"
         label="Phone"
         value={phone}
         onChange={(e) => setPhone(e.target.value)}
-        placeholder="Phone"
+        placeholder="+1 123 456 7890"
       />
       <LabeledInput
         type="email"
         label="Email"
         value={email}
         onChange={(e) => setEmail(e.target.value)}
-        placeholder="2025-04-15T20:00:00.000Z"
+        placeholder="jane@example.com"
       />
-
       <LabeledInput
+        textArea
         type="text"
         label="Message"
         value={message}
         onChange={(e) => setMessage(e.target.value)}
-        placeholder="Message"
+        placeholder="Write your message here..."
       />
 
       <button
         type="submit"
         disabled={loading || !name || !email || !message || !phone}
-        className="bg-blue-600 cursor-pointer text-white px-4 py-2 rounded hover:bg-blue-700 disabled:opacity-50"
+        className="w-full bg-blue-600 text-white px-4 py-2 rounded-xl transition duration-300 hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed shadow-md"
       >
         {loading ? "Submitting..." : "Submit Form"}
       </button>
 
-      {error && <p className="text-red-600 mt-2">Error: {error.message}</p>}
+      {error && (
+        <p className="text-sm text-red-600 text-center">
+          Error: {error.message}
+        </p>
+      )}
       {data && (
-        <p className="text-green-600 mt-2">
-          {data
-            ? `Form submitted successfully!`
-            : "There was an error submitting the form."}
+        <p className="text-sm text-green-600 text-center">
+          Form submitted successfully!
         </p>
       )}
     </form>

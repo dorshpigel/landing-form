@@ -3,18 +3,18 @@ import { ReactNode } from "react";
 export default function AppLayout({ children }: { children: ReactNode }) {
   return (
     <div className="min-h-screen bg-gray-100 text-gray-900">
-      <header className="bg-white flex flex-row shadow-md p-4 gap-4 sticky top-0 z-10">
-        <img
-          className="max-w-[1.75rem] max-h-[1.75rem]"
-          src={
-            "title-icon.png"
-          }
-        ></img>
-        <div className="w-full mx-auto text-xl font-semibold">
-          Landing Form
+      <header className="bg-white shadow-md sticky top-0 z-10">
+        <div className="container mx-auto flex items-center gap-3 p-4">
+          <img
+            src="title-icon.png"
+            alt="Logo"
+            className="w-7 h-7 transition-transform hover:scale-105"
+          />
+          <h1 className="text-xl font-semibold">Landing Form</h1>
         </div>
       </header>
-      <main className="w-full mx-auto p-4">{children}</main>
+
+      <main className="container mx-auto p-4">{children}</main>
     </div>
   );
 }

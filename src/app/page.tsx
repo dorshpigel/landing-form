@@ -9,9 +9,13 @@ export default function HomePage() {
   return (
     <RootLayout>
       <AppLayout>
-        <h1 className="text-3xl font-bold mb-6 text-center">Get in Touch</h1>
+        <h1 className="font-sans text-3xl font-bold mb-6 text-center">Get in Touch</h1>
         <Form onSuccess={() => console.log("Success callback fired")} />
-        <ToastContainer position="top-center" />
+        <ToastContainer
+          theme="dark"
+          pauseOnHover={true}
+          position="bottom-left"
+        />
       </AppLayout>
     </RootLayout>
   );
